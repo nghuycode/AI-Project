@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MapGenerator : MonoBehaviour
 {
-    public GameObject Cell, Cam;
+    public GameObject Cell, Cam, Player, Enemy;
     public int row, column;
     public Vector3 OriginalPosition, CellSize;
     private void Start() {
@@ -26,17 +26,19 @@ public class MapGenerator : MonoBehaviour
                 GO.transform.position = desiredPosition;
             }
         }
-        Cam.transform.position = GetCenterPosition() + new Vector3(0, 10, 0);
+        //Cam.transform.position = GetCenterPosition() + new Vector3(0, 10, 0);
+        Player.GetComponent<Player>().InitRC(0, 0);
+        Enemy.GetComponent<Enemy>().InitRC(row - 1, column - 1);
     }
-    public int GetIDByRowColumn(int id_r, int id_c) {
-        return id_r * column + id_c;
+    public Vector3 GetPositionByRowColumn(int id_r, int id_c) {
+        int id = id_r * column + id_c;
+        return this.transform.GetChild(id).transform.position;
     }
     public Vector3 GetCenterPosition() {
         Vector3 centerPosition;
         int idr = row - 1, idc = column - 1;
-        int centerID = GetIDByRowColumn(idr / 2, idc / 2);
         Debug.Log("Row:" + idr / 2 + "_" + "Column:" + idc / 2);
-        centerPosition = this.transform.GetChild(centerID).transform.position;
+        centerPosition = GetPositionByRowColumn(idr / 2, idc / 2);
         if (row % 2 == 0)
             centerPosition += new Vector3((float)CellSize.x / (float)2, 0, 0);
         if (column % 2 == 0)

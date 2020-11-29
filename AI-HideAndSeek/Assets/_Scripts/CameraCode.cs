@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class CameraCode : MonoBehaviour
 {
-    public MapGenerator MapGenerator;
+    public GameObject Player;
     private void Start() {
-        
+        //this.transform.LookAt(Player.transform);
     }
 }
