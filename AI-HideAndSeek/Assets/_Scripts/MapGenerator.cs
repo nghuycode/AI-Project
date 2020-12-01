@@ -4,9 +4,14 @@ using UnityEngine;
 
 public class MapGenerator : MonoBehaviour
 {
+    public static MapGenerator Instance;
     public GameObject Cell, Cam, Player, Enemy;
     public int row, column;
     public Vector3 OriginalPosition, CellSize;
+    public int[,] Matrix = new int[100,100];
+    private void Awake() {
+        Instance = this;
+    }
     private void Start() {
         CellSize = Cell.GetComponent<BoxCollider>().size;
         GenerateMap();
@@ -26,9 +31,23 @@ public class MapGenerator : MonoBehaviour
                 GO.transform.position = desiredPosition;
             }
         }
-        //Cam.transform.position = GetCenterPosition() + new Vector3(0, 10, 0);
-        Player.GetComponent<Player>().InitRC(0, 0);
-        Enemy.GetComponent<Enemy>().InitRC(row - 1, column - 1);
+        for (int i = 0; i < row; ++i) 
+        {
+            for (int j = 0; j < column; ++j) 
+            {
+                switch (Matrix[i, j]) 
+                {
+                    case 2:
+                        Player.GetComponent<Player>().InitRC(i, j);
+                        break;
+                    case 3:
+                        Enemy.GetComponent<Player>().InitRC(i, j); 
+                        break;
+                }
+            }
+        }
+        // Player.GetComponent<Player>().InitRC(0, 0);
+        // Enemy.GetComponent<Enemy>().InitRC(row - 1, column - 1);
     }
     public Vector3 GetPositionByRowColumn(int id_r, int id_c) {
         int id = id_r * column + id_c;

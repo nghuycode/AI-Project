@@ -7,9 +7,6 @@ public class Player : MonoBehaviour
     public int Row, RowToGo, Column, ColumnToGo;
     public MapGenerator MapGenerator;
     public Animator Anim;
-    private void Start() {
-
-    }
     public void InitRC(int r, int c) {
         Row = r;
         Column = c;
