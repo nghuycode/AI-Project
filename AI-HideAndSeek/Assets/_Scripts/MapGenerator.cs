@@ -5,23 +5,18 @@ using UnityEngine;
 public class MapGenerator : MonoBehaviour
 {
     public static MapGenerator Instance;
-    public GameObject Cell, Cam, Player, Enemy;
-    public int row, column;
+    public GameObject Cell, Player, Enemy;
     public Vector3 OriginalPosition, CellSize;
-    public int[,] Matrix = new int[100,100];
+
     private void Awake() {
         Instance = this;
     }
     private void Start() {
         CellSize = Cell.GetComponent<BoxCollider>().size;
-        GenerateMap();
     }
-    private void Update() {
-        
-    }
-    private void GenerateMap() {
+    public void GenerateMap(int row, int column, int[,] Matrix) {
+        //Spawn cell of map
         Vector3 desiredPosition = OriginalPosition;
-
         for (int i = 0; i < row; ++i) 
         {
             for (int j = 0; j < column; ++j)
@@ -31,6 +26,8 @@ public class MapGenerator : MonoBehaviour
                 GO.transform.position = desiredPosition;
             }
         }
+
+        //Apply info of matrix on map
         for (int i = 0; i < row; ++i) 
         {
             for (int j = 0; j < column; ++j) 
@@ -41,26 +38,30 @@ public class MapGenerator : MonoBehaviour
                         Player.GetComponent<Player>().InitRC(i, j);
                         break;
                     case 3:
-                        Enemy.GetComponent<Player>().InitRC(i, j); 
+                        Enemy.GetComponent<Enemy>().InitRC(i, j); 
+                        break;
+                    case 4:
+                        ObstacleManager.Instance.SpawnObstacle(i, j);
                         break;
                 }
             }
         }
-        // Player.GetComponent<Player>().InitRC(0, 0);
-        // Enemy.GetComponent<Enemy>().InitRC(row - 1, column - 1);
     }
-    public Vector3 GetPositionByRowColumn(int id_r, int id_c) {
-        int id = id_r * column + id_c;
+    public Cell GetCellByRowColumn(int row, int column) {
+        return this.transform.GetChild(row * GameManager.Instance.Column + column).GetComponent<Cell>();
+    }
+    public Vector3 GetPositionByRowColumn(int row, int column) {
+        int id = row * GameManager.Instance.Column + column;
         return this.transform.GetChild(id).transform.position;
     }
     public Vector3 GetCenterPosition() {
         Vector3 centerPosition;
-        int idr = row - 1, idc = column - 1;
+        int idr = GameManager.Instance.Row - 1, idc = GameManager.Instance.Column - 1;
         Debug.Log("Row:" + idr / 2 + "_" + "Column:" + idc / 2);
         centerPosition = GetPositionByRowColumn(idr / 2, idc / 2);
-        if (row % 2 == 0)
+        if (GameManager.Instance.Row % 2 == 0)
             centerPosition += new Vector3((float)CellSize.x / (float)2, 0, 0);
-        if (column % 2 == 0)
+        if (GameManager.Instance.Column % 2 == 0)
             centerPosition += new Vector3(0, 0, (float)CellSize.z / (float)2);
         return centerPosition;
     } 

@@ -9,80 +9,46 @@ using UnityEngine;
 
 public class HSocket : MonoBehaviour
 {
-    private static Socket ConnectSocket(string server, int port)
-    {
-        Socket s = null;
-        IPHostEntry hostEntry = null;
-
-        // Get host related information.
-        hostEntry = Dns.GetHostEntry(server);
-
-        // Loop through the AddressList to obtain the supported AddressFamily. This is to avoid
-        // an exception that occurs when the host IP Address is not compatible with the address family
-        // (typical in the IPv6 case).
-        foreach(IPAddress address in hostEntry.AddressList)
-        {
-            IPEndPoint ipe = new IPEndPoint(address, port);
-            Socket tempSocket =
-                new Socket(ipe.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-
-            try {
-                tempSocket.Connect(ipe);
-            }
-            catch {
-
-            }
-
-            if(tempSocket.Connected)
-            {
-                s = tempSocket;
-                break;
-            }
-            else
-            {
-                continue;
-            }
-        }
-        return s;
+    public Socket socket_server = null;
+    private void Start() {
+        socket_server = CreateServer(Dns.GetHostName(), 8000);
     }
-        
-    private static string SocketSendReceive(string server, int port)
+    private static Socket CreateServer(string server, int port)
     {
-        string request = "GET / HTTP/1.1\r\nHost: " + server +
-            "\r\nConnection: Close\r\n\r\n";
-        Byte[] bytesSent = Encoding.ASCII.GetBytes(request);
+        IPHostEntry hostEntry = Dns.GetHostEntry(server);
+        IPAddress address = hostEntry.AddressList[2];
+        IPEndPoint ipe = new IPEndPoint(address, port);
+        Socket socket_server = new Socket(address.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+        socket_server.Bind(ipe);
+        socket_server.Listen(10);
+        return socket_server;
+    }
+
+    static string Receive(Socket socket)
+    {
         Byte[] bytesReceived = new Byte[256];
         string page = "";
-
-        // Create a socket connection with the specified server and port.
-        using(Socket s = ConnectSocket(server, port)) {
-
-            if (s == null)
-                return ("Connection failed");
-
-            // Send request to the server.
-            s.Send(bytesSent, bytesSent.Length, 0);
-
-            // Receive the server home page content.
+        {
             int bytes = 0;
-            page = "Default HTML page on " + server + ":\r\n";
-
-            // The following will block until the page is transmitted.
-            do {
-                bytes = s.Receive(bytesReceived, bytesReceived.Length, 0);
+            do
+            {
+                bytes = socket.Receive(bytesReceived, bytesReceived.Length, 0);
                 page = page + Encoding.ASCII.GetString(bytesReceived, 0, bytes);
             }
             while (bytes > 0);
         }
-
         return page;
     }
-    public void RunSocket()
-    {
-        Socket socket = ConnectSocket(Dns.GetHostName(), 8000);
-        //socket.Send(Encoding.UTF8.GetBytes("NGU"));
-        socket.Close();
-        Debug.Log(SocketSendReceive(Dns.GetHostName(), 8000));
 
+    public void Socket()
+    {
+        StartCoroutine(RunSocket());
+    }
+    private IEnumerator RunSocket() {
+        string message = "";
+        Socket socket = socket_server.Accept();
+        message = Receive(socket);
+        yield return new WaitUntil(() => message != "");
+        Debug.Log(message);
     }
 }
