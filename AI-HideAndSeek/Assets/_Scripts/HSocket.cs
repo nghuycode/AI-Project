@@ -20,7 +20,7 @@ public class HSocket : MonoBehaviour
         IPEndPoint ipe = new IPEndPoint(address, port);
         Socket socket_server = new Socket(address.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
         socket_server.Bind(ipe);
-        socket_server.Listen(10);
+        socket_server.Listen(1000);
         return socket_server;
     }
 
@@ -45,11 +45,11 @@ public class HSocket : MonoBehaviour
         StartCoroutine(RunSocket());
     }
     private IEnumerator RunSocket() {
+        GameManager.Instance.SwitchTurn();
         string message = "";
         Socket socket = socket_server.Accept();
         message = Receive(socket);
         yield return new WaitUntil(() => message != "");
-        Debug.Log(message);
         IOCommunicate.Instance.Load(message);
     }
 }

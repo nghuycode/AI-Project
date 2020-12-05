@@ -14,14 +14,13 @@ public class MapGenerator : MonoBehaviour
     private void Start() {
         CellSize = Cell.GetComponent<BoxCollider>().size;
     }
-    public void GenerateMap(int row, int column, int[,] Matrix) {
-        if (this.transform.childCount == 0) {
-            InitState(row, column, Matrix);
-        }
+    public void GenerateMap(int row, int column, int type, int[,] Matrix) {
+        if (this.transform.childCount == 0) 
+            InitState(row, column, type, Matrix);
         else 
-            NormalState(row, column, Matrix);
+            NormalState(row, column, type, Matrix);
     }
-    private void InitState(int row, int column, int[,] Matrix) {
+    private void InitState(int row, int column, int type, int[,] Matrix) {
         //Spawn cell of map
         Vector3 desiredPosition = OriginalPosition;
         for (int i = 0; i < row; ++i) 
@@ -47,43 +46,73 @@ public class MapGenerator : MonoBehaviour
                         ObstacleManager.Instance.SpawnObstacle(i, j, 1);
                         break;
                     case 2:
-                        Player.GetComponent<Player>().InitRC(i, j);
+                        Player.GetComponent<PlayerTeam>().InitAMember(i, j);
                         break;
                     case 3:
-                        Enemy.GetComponent<Enemy>().InitRC(i, j); 
+                        Enemy.GetComponent<Enemy>().InitRC(i, j);
                         break;
                     // case 4:
                     //     ObstacleManager.Instance.SpawnObstacle(i, j, 4);
                     //     break;
+                    case 5:
+                        Cell Cell1 = MapGenerator.Instance.GetCellByRowColumn(i, j);
+                        Cell1.GetVision(0);
+                        break;
+                    case 6:
+                        Cell Cell2 = MapGenerator.Instance.GetCellByRowColumn(i, j);
+                        Cell2.GetVision(1);
+                        break;
                 }
             }
         }
     }
-    private void NormalState(int row, int column, int[,] Matrix) {
-        for (int i = 0; i < row; ++i) 
+    private void NormalState(int row, int column, int type, int[,] Matrix) {
+        Player.GetComponent<PlayerTeam>().DisableIndicator();
+        Enemy.GetComponent<Enemy>().DisableIndicator();
+        for (int i = 0; i < this.transform.childCount; ++i)
+            this.transform.GetChild(i).GetComponent<Cell>().LostVision();
+        if (type == -1)
         {
-            for (int j = 0; j < column; ++j) 
+
+        }
+        else
+        if (type == 0)
+        {
+            Enemy.GetComponent<Enemy>().EnableIndicator();
+        }
+        else
+        {
+            Player.GetComponent<PlayerTeam>().EnableIndicator(type);
+        }
+        for (int i = 0; i < row; ++i)
+        {
+            for (int j = 0; j < column; ++j)
             {
-                switch (Matrix[i, j]) 
+                if (Matrix[i, j] == 3)
+                    Enemy.GetComponent<Enemy>().DecideMove(i, j);
+                else if (Matrix[i, j] == 2)
+                    Player.GetComponent<PlayerTeam>().TeamDecideMove(type, i, j);
+                else if (Matrix[i, j] == 5)
                 {
-                    case 2:
-                        Player.GetComponent<Player>().DecideMove(i, j);
-                        break;
-                    case 3:
-                        Enemy.GetComponent<Enemy>().DecideMove(i, j); 
-                        break;
-                    // case 4:
-                    //     ObstacleManager.Instance.SpawnObstacle(i, j);
-                    //     break;
+                    if (type == 0)
+                    {
+                        Cell Cell1 = MapGenerator.Instance.GetCellByRowColumn(i, j);
+                        Cell1.GetVision(0);
+                    }
+                    else
+                    {
+                        Cell Cell2 = MapGenerator.Instance.GetCellByRowColumn(i, j);
+                        Cell2.GetVision(1);
+                    }
                 }
             }
         }
+        
     }
     public Cell GetCellByRowColumn(int row, int column) {
         return this.transform.GetChild(row * GameManager.Instance.Column + column).GetComponent<Cell>();
     }
     public Vector3 GetPositionByRowColumn(int row, int column) {
-        Debug.Log(row.ToString() + '-' + column.ToString());
         int id = row * GameManager.Instance.Column + column;
         return this.transform.GetChild(id).transform.position;
     }

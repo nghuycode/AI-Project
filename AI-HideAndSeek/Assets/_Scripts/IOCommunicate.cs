@@ -25,20 +25,23 @@ public class IOCommunicate : MonoBehaviour
         row = int.Parse(rowcolumn[0]);
         column = int.Parse(rowcolumn[1]);
 
+        //read type of agent
+        int type = int.Parse(datas[1]);
+
         //Read the matrix
         mat = new string[row];
         for (int i = 0; i < row; ++i) 
-            mat[i] = datas[i + 1];
+            mat[i] = datas[i + 2];
         matrix = mat
                .Select(l => l.Split(' ').Select(i => int.Parse(i)).ToArray())
                .ToArray();
         
         //Read the ping position
         int pingX = 0, pingY = 0;
-        // ping = datas[row + 1].Split(' ');
-        // pingX = int.Parse(ping[0]);
-        // pingY = int.Parse(ping[1]);
+        ping = datas[row + 2].Split(' ');
+        pingX = int.Parse(ping[0]);
+        pingY = int.Parse(ping[1]);
 
-        GameManager.Instance.ApplyInfo(row, column, matrix, pingX, pingY);
+        GameManager.Instance.ApplyInfo(row, column, type, matrix, pingX, pingY);
     }
 }

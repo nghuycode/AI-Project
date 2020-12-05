@@ -5,21 +5,21 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
-    public Player Player;
+    public PlayerTeam Player;
     public Enemy Enemy;
     public int Row, Column;
     public Vector2 Ping;
     public int[,] Matrix = new int[100,100];
 
-    public enum Turn {Player, Enemy};
+    public enum Turn {NULL, Player, Enemy};
     public Turn CurrentTurn;
     private void Awake() {
         Instance = this;
     }
-    public void ApplyInfo(int _row, int _column, int[][] _matrix, int pingX, int pingY) {
+    public void ApplyInfo(int _row, int _column, int type, int[][] _matrix, int pingX, int pingY) {
 
         //Disable Player + Enemy
-        Player.DisableRender();
+        Player.DisableAllMember();
         Enemy.DisableRender();
 
         //Apply row + column
@@ -34,35 +34,44 @@ public class GameManager : MonoBehaviour
 
         //Apply the announce pos
         Ping = new Vector2(pingX, pingY);
+        PingCell();
 
         //ObstacleManager.Instance.ClearObstacle();
-        MapGenerator.Instance.GenerateMap(Row, Column, Matrix);
+        MapGenerator.Instance.GenerateMap(Row, Column, type, Matrix);
     }
     public void SwitchTurn() {
-        StartCoroutine(HoldToSwitchTurn());
-    }
-    IEnumerator HoldToSwitchTurn()
-    {
-        yield return new WaitForSeconds(1);
+        if (CurrentTurn == Turn.NULL)
+            CurrentTurn = Turn.Enemy;
+        else
         if (CurrentTurn == Turn.Player)
             CurrentTurn = Turn.Enemy;
         else    
             CurrentTurn = Turn.Player;
+        //StartCoroutine(HoldToSwitchTurn());
+    }
+    IEnumerator HoldToSwitchTurn()
+    {
+        yield return new WaitForSeconds(1); 
     }
     private void Update() {
         CheckFound();
     }
     public void CheckFound() {
-        if (Player.Row == Enemy.Row && Player.Column == Enemy.Column)
+        for (int i = 0; i < Player.GetComponent<PlayerTeam>().Players.Count; ++i)
         {
-            Debug.Log("END");
-            Player.EnableRender();
-            Player.Die();
-            Enemy.EnableRender();
-            Enemy.Kill();
+            Player playerTMP = Player.GetComponent<PlayerTeam>().Players[i];
+            if (playerTMP.Row == Enemy.Row && playerTMP.Column == Enemy.Column)
+            {
+                Debug.Log("END");
+                playerTMP.EnableRender();
+                playerTMP.Die();
+                Enemy.EnableRender();
+                Enemy.Kill();
+            }
         }
     }
     public void PingCell() {
+        if (Ping.x == -1 || Ping.y == -1) return;
         MapGenerator.Instance.GetCellByRowColumn((int)Ping.x, (int)Ping.y).Ping();
     }
 }

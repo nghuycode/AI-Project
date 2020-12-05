@@ -5,9 +5,9 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     public int Row, RowToGo, Column, ColumnToGo;
-    public GameObject Render;
-    public MapGenerator MapGenerator;
+    public GameObject Render, Indicator;
     public Animator Anim;
+    public Camera Camera;
     public enum Direction {
         LEFT, RIGHT, UP, DOWN, LEFTUP, LEFTDOWN, RIGHTUP, RIGHTDOWN
     }
@@ -15,13 +15,23 @@ public class Enemy : MonoBehaviour
         EnableRender();
         Row = r;
         Column = c;
-        this.transform.position = MapGenerator.GetPositionByRowColumn(Row, Column);
+        this.transform.position = MapGenerator.Instance.GetPositionByRowColumn(Row, Column);
     }
     public void EnableRender() {
         Render.SetActive(true);
+        //Camera.enabled = true;
     }
     public void DisableRender() {
         Render.SetActive(false);
+        //Camera.enabled = false;
+    }
+    public void EnableIndicator()
+    {
+        Indicator.SetActive(true);
+    }
+    public void DisableIndicator()
+    {
+        Indicator.SetActive(false);
     }
     private void Update() {
         if (Input.GetKeyUp(KeyCode.A)) {
@@ -73,7 +83,7 @@ public class Enemy : MonoBehaviour
             else if (newColumn < Column)
                 Move(Direction.LEFT);
         }
-        else if (newColumn != Column) 
+        else  
         {
             if (newRow > Row)
                 Move(Direction.DOWN);
@@ -84,40 +94,38 @@ public class Enemy : MonoBehaviour
     public void Move(Direction dir) {
         // if (GameManager.Instance.CurrentTurn != GameManager.Turn.Enemy)
         //     return;
-        Debug.Log(this.gameObject.name + " : " + dir);
-        GameManager.Instance.SwitchTurn();
         switch (dir) {
             case Direction.LEFT:
                 this.transform.eulerAngles = new Vector3(0, 180, 0);
-                StartCoroutine(Move(MapGenerator.GetPositionByRowColumn(Row, --Column)));
+                StartCoroutine(Move(MapGenerator.Instance.GetPositionByRowColumn(Row, --Column)));
                 break;
             case Direction.RIGHT:
                 this.transform.eulerAngles = new Vector3(0, 0, 0);
-                StartCoroutine(Move(MapGenerator.GetPositionByRowColumn(Row, ++Column)));
+                StartCoroutine(Move(MapGenerator.Instance.GetPositionByRowColumn(Row, ++Column)));
                 break;
             case Direction.UP:
                 this.transform.eulerAngles = new Vector3(0, -90, 0);
-                StartCoroutine(Move(MapGenerator.GetPositionByRowColumn(--Row, Column)));
+                StartCoroutine(Move(MapGenerator.Instance.GetPositionByRowColumn(--Row, Column)));
                 break;
             case Direction.DOWN:
                 this.transform.eulerAngles = new Vector3(0, 90, 0);
-                StartCoroutine(Move(MapGenerator.GetPositionByRowColumn(++Row, Column)));
+                StartCoroutine(Move(MapGenerator.Instance.GetPositionByRowColumn(++Row, Column)));
                 break;
             case Direction.LEFTDOWN:
                 this.transform.eulerAngles = new Vector3(0, 135, 0);
-                StartCoroutine(Move(MapGenerator.GetPositionByRowColumn(++Row, --Column)));
+                StartCoroutine(Move(MapGenerator.Instance.GetPositionByRowColumn(++Row, --Column)));
                 break;
             case Direction.LEFTUP:
                 this.transform.eulerAngles = new Vector3(0, -135, 0);
-                StartCoroutine(Move(MapGenerator.GetPositionByRowColumn(--Row, --Column)));
+                StartCoroutine(Move(MapGenerator.Instance.GetPositionByRowColumn(--Row, --Column)));
                 break;
             case Direction.RIGHTDOWN:
                 this.transform.eulerAngles = new Vector3(0, 45, 0);
-                StartCoroutine(Move(MapGenerator.GetPositionByRowColumn(++Row, ++Column)));
+                StartCoroutine(Move(MapGenerator.Instance.GetPositionByRowColumn(++Row, ++Column)));
                 break;
             case Direction.RIGHTUP:
                 this.transform.eulerAngles = new Vector3(0, -45, 0);
-                StartCoroutine(Move(MapGenerator.GetPositionByRowColumn(--Row, ++Column)));
+                StartCoroutine(Move(MapGenerator.Instance.GetPositionByRowColumn(--Row, ++Column)));
                 break;
         }
     }
