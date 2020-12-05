@@ -50,5 +50,6 @@ public class HSocket : MonoBehaviour
         message = Receive(socket);
         yield return new WaitUntil(() => message != "");
         Debug.Log(message);
+        IOCommunicate.Instance.Load(message);
     }
 }

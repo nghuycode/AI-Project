@@ -5,7 +5,7 @@ using UnityEngine;
 public class ObstacleManager : MonoBehaviour
 {
     public static ObstacleManager Instance;
-    public GameObject Obstacle;
+    public GameObject[] Obstacle;
 
     private void Awake() {
         Instance = this;
@@ -14,7 +14,7 @@ public class ObstacleManager : MonoBehaviour
         for (int i = 0; i < this.transform.childCount; ++i)
             GameObject.Destroy(this.transform.GetChild(i).gameObject);
     }
-    public void SpawnObstacle(int row, int column) {
-        Instantiate(Obstacle, MapGenerator.Instance.GetPositionByRowColumn(row, column), Quaternion.identity, this.transform);
+    public void SpawnObstacle(int row, int column, int id) {
+        Instantiate(Obstacle[id], MapGenerator.Instance.GetPositionByRowColumn(row, column), Quaternion.identity, this.transform);
     }
 }

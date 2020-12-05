@@ -5,7 +5,7 @@ using UnityEngine;
 public class MapGenerator : MonoBehaviour
 {
     public static MapGenerator Instance;
-    public GameObject Cell, Player, Enemy;
+    public GameObject Cell, Player, Enemy, Wall;
     public Vector3 OriginalPosition, CellSize;
 
     private void Awake() {
@@ -15,6 +15,13 @@ public class MapGenerator : MonoBehaviour
         CellSize = Cell.GetComponent<BoxCollider>().size;
     }
     public void GenerateMap(int row, int column, int[,] Matrix) {
+        if (this.transform.childCount == 0) {
+            InitState(row, column, Matrix);
+        }
+        else 
+            NormalState(row, column, Matrix);
+    }
+    private void InitState(int row, int column, int[,] Matrix) {
         //Spawn cell of map
         Vector3 desiredPosition = OriginalPosition;
         for (int i = 0; i < row; ++i) 
@@ -27,7 +34,32 @@ public class MapGenerator : MonoBehaviour
             }
         }
 
-        //Apply info of matrix on map
+        //init info of matrix on map
+        for (int i = 0; i < row; ++i) 
+        {
+            for (int j = 0; j < column; ++j) 
+            {
+                switch (Matrix[i, j]) 
+                {
+                    case 0:
+                        break;
+                    case 1:
+                        ObstacleManager.Instance.SpawnObstacle(i, j, 1);
+                        break;
+                    case 2:
+                        Player.GetComponent<Player>().InitRC(i, j);
+                        break;
+                    case 3:
+                        Enemy.GetComponent<Enemy>().InitRC(i, j); 
+                        break;
+                    // case 4:
+                    //     ObstacleManager.Instance.SpawnObstacle(i, j, 4);
+                    //     break;
+                }
+            }
+        }
+    }
+    private void NormalState(int row, int column, int[,] Matrix) {
         for (int i = 0; i < row; ++i) 
         {
             for (int j = 0; j < column; ++j) 
@@ -35,14 +67,14 @@ public class MapGenerator : MonoBehaviour
                 switch (Matrix[i, j]) 
                 {
                     case 2:
-                        Player.GetComponent<Player>().InitRC(i, j);
+                        Player.GetComponent<Player>().DecideMove(i, j);
                         break;
                     case 3:
-                        Enemy.GetComponent<Enemy>().InitRC(i, j); 
+                        Enemy.GetComponent<Enemy>().DecideMove(i, j); 
                         break;
-                    case 4:
-                        ObstacleManager.Instance.SpawnObstacle(i, j);
-                        break;
+                    // case 4:
+                    //     ObstacleManager.Instance.SpawnObstacle(i, j);
+                    //     break;
                 }
             }
         }
@@ -51,6 +83,7 @@ public class MapGenerator : MonoBehaviour
         return this.transform.GetChild(row * GameManager.Instance.Column + column).GetComponent<Cell>();
     }
     public Vector3 GetPositionByRowColumn(int row, int column) {
+        Debug.Log(row.ToString() + '-' + column.ToString());
         int id = row * GameManager.Instance.Column + column;
         return this.transform.GetChild(id).transform.position;
     }

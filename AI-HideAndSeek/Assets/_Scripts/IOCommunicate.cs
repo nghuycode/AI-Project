@@ -19,7 +19,8 @@ public class IOCommunicate : MonoBehaviour
     public void Load(string data) {
         //Read row and column
         int row, column;
-        datas = File.ReadAllLines("Assets/data.txt");
+        //datas = File.ReadAllLines("Assets/data.txt");
+        datas = data.Split('\n');
         string[] rowcolumn = datas[0].Split(' ');
         row = int.Parse(rowcolumn[0]);
         column = int.Parse(rowcolumn[1]);
@@ -32,12 +33,11 @@ public class IOCommunicate : MonoBehaviour
                .Select(l => l.Split(' ').Select(i => int.Parse(i)).ToArray())
                .ToArray();
         
-        Debug.Log(matrix[0][2]);
         //Read the ping position
-        int pingX, pingY;
-        ping = datas[row + 1].Split(' ');
-        pingX = int.Parse(ping[0]);
-        pingY = int.Parse(ping[1]);
+        int pingX = 0, pingY = 0;
+        // ping = datas[row + 1].Split(' ');
+        // pingX = int.Parse(ping[0]);
+        // pingY = int.Parse(ping[1]);
 
         GameManager.Instance.ApplyInfo(row, column, matrix, pingX, pingY);
     }
