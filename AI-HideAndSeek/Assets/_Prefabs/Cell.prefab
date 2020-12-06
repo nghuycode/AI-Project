@@ -107,10 +107,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 371392a2636e9e540b71ad74617dadfb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Anim: {fileID: -5297330843959280937}
   Normal: {fileID: 2100000, guid: ca74e71796ea8ee4283786aecb208813, type: 2}
   Red: {fileID: 2100000, guid: d13fe73e8d7dbf7478862315c13b903f, type: 2}
   Blue: {fileID: 2100000, guid: 1535d836d593aae49b4ef4a945463fb1, type: 2}
+  Yellow: {fileID: 2100000, guid: fadf2969a28fd6e4db209e0d0ad92a21, type: 2}
 --- !u!95 &-5297330843959280937
 Animator:
   serializedVersion: 3
@@ -121,7 +121,7 @@ Animator:
   m_GameObject: {fileID: 7364473198611084699}
   m_Enabled: 0
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: ae19d82c5bbb8c347873fcf0e5b68185, type: 2}
+  m_Controller: {fileID: 0}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

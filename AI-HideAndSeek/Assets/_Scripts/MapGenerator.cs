@@ -54,14 +54,6 @@ public class MapGenerator : MonoBehaviour
                     // case 4:
                     //     ObstacleManager.Instance.SpawnObstacle(i, j, 4);
                     //     break;
-                    case 5:
-                        Cell Cell1 = MapGenerator.Instance.GetCellByRowColumn(i, j);
-                        Cell1.GetVision(0);
-                        break;
-                    case 6:
-                        Cell Cell2 = MapGenerator.Instance.GetCellByRowColumn(i, j);
-                        Cell2.GetVision(1);
-                        break;
                 }
             }
         }
@@ -88,22 +80,27 @@ public class MapGenerator : MonoBehaviour
         {
             for (int j = 0; j < column; ++j)
             {
-                if (Matrix[i, j] == 3)
-                    Enemy.GetComponent<Enemy>().DecideMove(i, j);
-                else if (Matrix[i, j] == 2)
-                    Player.GetComponent<PlayerTeam>().TeamDecideMove(type, i, j);
-                else if (Matrix[i, j] == 5)
-                {
-                    if (type == 0)
-                    {
-                        Cell Cell1 = MapGenerator.Instance.GetCellByRowColumn(i, j);
-                        Cell1.GetVision(0);
-                    }
-                    else
-                    {
-                        Cell Cell2 = MapGenerator.Instance.GetCellByRowColumn(i, j);
-                        Cell2.GetVision(1);
-                    }
+                switch (Matrix[i, j]) {
+                    case 2:
+                        Player.GetComponent<PlayerTeam>().TeamDecideMove(type, i, j);
+                        break;
+                    case 3:
+                        Enemy.GetComponent<Enemy>().DecideMove(i, j);
+                        if (type != 0)
+                            MapGenerator.Instance.GetCellByRowColumn(i, j).GetVision(1);
+                        break;
+                    case 5:
+                        if (type == 0)
+                        {
+                            Cell Cell1 = MapGenerator.Instance.GetCellByRowColumn(i, j);
+                            Cell1.GetVision(0);
+                        }
+                        else if (type != -1)
+                        {
+                            Cell Cell2 = MapGenerator.Instance.GetCellByRowColumn(i, j);
+                            Cell2.GetVision(1);
+                        }
+                        break;
                 }
             }
         }
@@ -113,6 +110,7 @@ public class MapGenerator : MonoBehaviour
         return this.transform.GetChild(row * GameManager.Instance.Column + column).GetComponent<Cell>();
     }
     public Vector3 GetPositionByRowColumn(int row, int column) {
+        //Debug.Log(row.ToString() + "-" + column.ToString());
         int id = row * GameManager.Instance.Column + column;
         return this.transform.GetChild(id).transform.position;
     }

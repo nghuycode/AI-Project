@@ -20,13 +20,13 @@ public class HSocket : MonoBehaviour
         IPEndPoint ipe = new IPEndPoint(address, port);
         Socket socket_server = new Socket(address.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
         socket_server.Bind(ipe);
-        socket_server.Listen(1000);
+        socket_server.Listen(1000000000);
         return socket_server;
     }
 
     static string Receive(Socket socket)
     {
-        Byte[] bytesReceived = new Byte[256];
+        Byte[] bytesReceived = new Byte[1000000000];
         string page = "";
         {
             int bytes = 0;
@@ -39,16 +39,21 @@ public class HSocket : MonoBehaviour
         }
         return page;
     }
-
+    public void StartGame() {
+        InvokeRepeating("Socket", 0, 1f);
+        //Socket();
+    }
     public void Socket()
     {
         StartCoroutine(RunSocket());
     }
     private IEnumerator RunSocket() {
-        GameManager.Instance.SwitchTurn();
         string message = "";
         Socket socket = socket_server.Accept();
-        message = Receive(socket);
+        message = Receive(socket);  
+        //print(message);
+        if (message == "") 
+            CancelInvoke();
         yield return new WaitUntil(() => message != "");
         IOCommunicate.Instance.Load(message);
     }

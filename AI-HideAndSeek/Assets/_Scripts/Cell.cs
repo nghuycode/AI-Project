@@ -4,19 +4,19 @@ using UnityEngine;
 
 public class Cell : MonoBehaviour
 {
-    public Material Normal, Red, Blue;
+    public Material Normal, Red, Blue, Yellow, OriginalMat;
     public void Ping() {
         StartCoroutine(GoPing());
     }
     IEnumerator GoPing() {
-        Material originalMat = this.GetComponent<MeshRenderer>().material;
+        OriginalMat = this.GetComponent<MeshRenderer>().material;
         for (int i = 0; i < 3; ++i) {
-            this.GetComponent<MeshRenderer>().material = Blue;
-            yield return new WaitForSeconds(0.5f);
+            this.GetComponent<MeshRenderer>().material = Yellow;
+            yield return new WaitForSeconds(0.1f);
             this.GetComponent<MeshRenderer>().material = Normal;
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.1f);
         }
-        this.GetComponent<MeshRenderer>().material = originalMat;
+        this.GetComponent<MeshRenderer>().material = OriginalMat;
     }
     public void GetVision(int id)
     {

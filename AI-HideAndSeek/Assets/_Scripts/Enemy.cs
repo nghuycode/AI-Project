@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    public int Row, RowToGo, Column, ColumnToGo;
+    public int Row, Column;
     public GameObject Render, Indicator;
     public Animator Anim;
     public Camera Camera;
@@ -22,7 +22,7 @@ public class Enemy : MonoBehaviour
         //Camera.enabled = true;
     }
     public void DisableRender() {
-        Render.SetActive(false);
+        //Render.SetActive(false);
         //Camera.enabled = false;
     }
     public void EnableIndicator()
@@ -61,8 +61,6 @@ public class Enemy : MonoBehaviour
     }
     public void DecideMove(int newRow, int newColumn) 
     {
-        // Debug.Log("New Row: " + newRow);
-        // Debug.Log("New Column" + newColumn);
         EnableRender();
         if (newRow != Row && newColumn != Column) 
         {
@@ -134,9 +132,11 @@ public class Enemy : MonoBehaviour
         //this.GetComponent<Animator>().SetTrigger("Kill");
     }
     private IEnumerator Move(Vector3 targetPosition) {
+        MapGenerator.Instance.GetCellByRowColumn(Row, Column).GetVision(0);
+        GameManager.Instance.score -= 1;
         Anim.SetBool("IsWalking", true);
         while (Mathf.Abs(this.transform.position.x - targetPosition.x) > 0.3f || Mathf.Abs(this.transform.position.z - targetPosition.z) > 0.3f) {
-            this.transform.position = Vector3.MoveTowards(this.transform.position, targetPosition, 0.02f);
+            this.transform.position = Vector3.MoveTowards(this.transform.position, targetPosition, 0.05f);
             yield return new WaitForSeconds(0.02f);
         }
         this.transform.position = targetPosition;

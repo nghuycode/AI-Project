@@ -1,22 +1,29 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
+    public Text ScoreText;
+    public int score;
     public static GameManager Instance;
     public PlayerTeam Player;
     public Enemy Enemy;
-    public int Row, Column;
+    public int Row, Column, KillCount;
     public Vector2 Ping;
     public int[,] Matrix = new int[100,100];
 
     public enum Turn {NULL, Player, Enemy};
     public Turn CurrentTurn;
+    public bool CanPlay;
     private void Awake() {
         Instance = this;
     }
-    public void ApplyInfo(int _row, int _column, int type, int[][] _matrix, int pingX, int pingY) {
+    private void Start() {
+        //RunPython();
+    }
+    public void ApplyInfo(int _row, int _column, int type, int[][] _matrix, Vector2[] pings) {
 
         //Disable Player + Enemy
         Player.DisableAllMember();
@@ -32,12 +39,13 @@ public class GameManager : MonoBehaviour
             for (int j = 0; j < Column; ++j) 
                 Matrix[i,j] = _matrix[i][j];
 
-        //Apply the announce pos
-        Ping = new Vector2(pingX, pingY);
-        PingCell();
 
         //ObstacleManager.Instance.ClearObstacle();
         MapGenerator.Instance.GenerateMap(Row, Column, type, Matrix);
+
+        //Apply the announce pos
+        for (int i = 0; i < pings.Length; i += 2)
+            PingCell((int)pings[i].x, (int)pings[i + 1].y);
     }
     public void SwitchTurn() {
         if (CurrentTurn == Turn.NULL)
@@ -54,24 +62,31 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(1); 
     }
     private void Update() {
-        CheckFound();
+        ScoreText.text = "Score: " + score.ToString();
+        if (CanPlay)
+            CheckFound();
     }
     public void CheckFound() {
         for (int i = 0; i < Player.GetComponent<PlayerTeam>().Players.Count; ++i)
         {
             Player playerTMP = Player.GetComponent<PlayerTeam>().Players[i];
-            if (playerTMP.Row == Enemy.Row && playerTMP.Column == Enemy.Column)
+            if (playerTMP.Row == Enemy.Row && playerTMP.Column == Enemy.Column && !playerTMP.IsDie)
             {
-                Debug.Log("END");
+                Debug.Log("KILL");
                 playerTMP.EnableRender();
                 playerTMP.Die();
                 Enemy.EnableRender();
                 Enemy.Kill();
+                KillCount++;
+                score += 20;
+                if (KillCount == Player.transform.childCount)
+                    CanPlay = false;
             }
         }
     }
-    public void PingCell() {
-        if (Ping.x == -1 || Ping.y == -1) return;
-        MapGenerator.Instance.GetCellByRowColumn((int)Ping.x, (int)Ping.y).Ping();
+    public void PingCell(int row, int column) {
+        //Debug.Log(row + " - " + column);
+        if (column == -1 || row == -1) return;
+        MapGenerator.Instance.GetCellByRowColumn(row, column).Ping();
     }
 }

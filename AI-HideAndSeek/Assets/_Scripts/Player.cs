@@ -4,11 +4,12 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public int Row, RowToGo, Column, ColumnToGo;
+    public int Row, Column;
     public GameObject Render, RenderBonus, Indicator;
     public MapGenerator MapGenerator;
     public Animator Anim;
     public Camera Camera;
+    public bool IsDie;
     public enum Direction {
         LEFT, RIGHT, UP, DOWN, LEFTUP, LEFTDOWN, RIGHTUP, RIGHTDOWN
     }
@@ -21,12 +22,12 @@ public class Player : MonoBehaviour
     public void EnableRender() {
         Render.SetActive(true);
         RenderBonus.SetActive(true);
-        //Camera.enabled = true;
     }
     public void DisableRender() {
+        if (!IsDie) {
         Render.SetActive(false);
         RenderBonus.SetActive(false);
-        //Camera.enabled = false;
+        }
     }
     
     private void Update() {
@@ -127,16 +128,19 @@ public class Player : MonoBehaviour
     }
     public void Die() 
     {
+        IsDie = true;
+        EnableRender();
         this.GetComponent<Animator>().SetTrigger("Die");
     }
     private IEnumerator Move(Vector3 targetPosition) {
+        MapGenerator.Instance.GetCellByRowColumn(Row, Column).GetVision(1);
         Anim.SetBool("IsWalking", true);
         while (Mathf.Abs(this.transform.position.x - targetPosition.x) > 0.3f || Mathf.Abs(this.transform.position.z - targetPosition.z) > 0.3f) {
-            this.transform.position = Vector3.MoveTowards(this.transform.position, targetPosition, 0.02f);
+            this.transform.position = Vector3.MoveTowards(this.transform.position, targetPosition, 0.1f);
             yield return new WaitForSeconds(0.02f);
         }
         this.transform.position = targetPosition;
         Anim.SetBool("IsWalking", false);
-        GameManager.Instance.SwitchTurn();
+        //GameManager.Instance.SwitchTurn();
     }
 }

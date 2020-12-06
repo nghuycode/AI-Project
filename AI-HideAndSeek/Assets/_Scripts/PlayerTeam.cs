@@ -8,6 +8,7 @@ public class PlayerTeam : MonoBehaviour
     public List<Player> Players = new List<Player>();
     public void EnableIndicator(int id)
     {
+        Debug.Log(id);
         Players[id - 1].Indicator.SetActive(true);
     }
     public void DisableIndicator()
@@ -24,11 +25,20 @@ public class PlayerTeam : MonoBehaviour
             for (int i = 0; i < Players.Count; ++i)
                 if (Players[i].Row == row && Players[i].Column == column)
                 {
-                    Players[id].DecideMove(row, column);
+                    Players[i].EnableRender();
+                    MapGenerator.Instance.GetCellByRowColumn(row, column).GetVision(0);
                     return;
                 }
         }
-        Players[id - 1].DecideMove(row, column);
+        else if (id - 1 < Players.Count) {
+            //MapGenerator.Instance.GetCellByRowColumn(row, column).GetVision(1);
+            for (int i = 0; i < Players.Count; ++i)
+                if (Players[i].Row == row && Players[i].Column == column) {
+                    Players[i].EnableRender();
+                    return;
+                }
+            Players[id - 1].DecideMove(row, column);
+        }
     }
     public void InitAMember(int row, int column)
     {
@@ -40,7 +50,7 @@ public class PlayerTeam : MonoBehaviour
     {
         for (int i = 0; i < Players.Count; ++i)
         {
-            Players[i].DisableRender();
+            //Players[i].DisableRender();
         }
     }
 }
